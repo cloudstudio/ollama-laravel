@@ -1,7 +1,7 @@
 
 # Ollama-Laravel Package
 
-Ollama-Laravel is a Laravel package providing seamless integration with the Ollama API. It includes functionalities for model management, prompt generation, format setting, and more. This package is perfect for developers looking to leverage the power of the Ollama API in their Laravel applications.
+Ollama-Laravel is a Laravel package that provides a seamless integration with the [Ollama API](https://github.com/jmorganca/ollama). It includes functionalities for model management, prompt generation, format setting, and more. This package is perfect for developers looking to leverage the power of the Ollama API in their Laravel applications.
 
 ## Installation
 
