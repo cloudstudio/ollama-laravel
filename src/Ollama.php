@@ -21,6 +21,7 @@ class Ollama
     protected $options;
     protected $stream;
     protected $raw;
+    protected $agent;
 
     /**
      * Ollama class constructor.
@@ -33,6 +34,18 @@ class Ollama
     }
 
     /**
+     * Sets the agent for generation.
+     *
+     * @param string $agent
+     * @return $this
+     */
+    public function agent(string $agent)
+    {
+        $this->agent = $agent;
+        return $this;
+    }
+
+    /**
      * Sets the prompt for generation.
      *
      * @param string $prompt
@@ -40,7 +53,7 @@ class Ollama
      */
     public function prompt(string $prompt)
     {
-        $this->prompt = $prompt;
+        $this->prompt = $this->agent ? $this->agent . ' ' . $prompt : $prompt;
         return $this;
     }
 
