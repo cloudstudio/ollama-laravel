@@ -19,7 +19,7 @@ class Ollama
     protected $prompt;
     protected $format;
     protected $options;
-    protected $stream;
+    protected $stream = false;
     protected $raw;
     protected $agent;
 
@@ -30,7 +30,6 @@ class Ollama
     {
         $this->modelService = $modelService;
         $this->model = config('ollama.model');
-        $this->options = [];
     }
 
     /**
@@ -53,7 +52,7 @@ class Ollama
      */
     public function prompt(string $prompt)
     {
-        $this->prompt = $this->agent ? $this->agent . ' ' . $prompt : $prompt;
+        $this->prompt = $prompt;
         return $this;
     }
 
@@ -88,7 +87,7 @@ class Ollama
      * @param array $options
      * @return $this
      */
-    public function options(array $options)
+    public function options(array $options = [])
     {
         $this->options = $options;
         return $this;
@@ -100,7 +99,7 @@ class Ollama
      * @param bool $stream
      * @return $this
      */
-    public function stream(bool $stream)
+    public function stream(bool $stream = false)
     {
         $this->stream = $stream;
         return $this;
@@ -196,6 +195,7 @@ class Ollama
     {
         return $this->sendRequest('/api/generate', [
             'model' => $this->model,
+            'system' => $this->agent,
             'prompt' => $this->prompt,
             'format' => $this->format,
             'options' => $this->options,

@@ -52,7 +52,7 @@ $response = Ollama::model('Llama2')->show();
 ### Copy a Model
 
 ```php
-Ollama::model('Llama2')->copy('newDestination');
+Ollama::model('Llama2')->copy('NewModel');
 ```
 
 ### Delete a Model
