@@ -43,7 +43,7 @@ $response = Ollama::agent('You are a weather expert...')
     ->ask();
 ```
 
-### Chat completion
+### Chat completion
 
 ```php
 $messages = [
