@@ -43,6 +43,23 @@ $response = Ollama::agent('You are a weather expert...')
     ->ask();
 ```
 
+### Chat completion
+
+```php
+$messages = [
+    ['role' => 'user', 'content' => 'My name is Toni Soriano and I live in Spain'],
+    ['role' => 'assistant', 'content' => 'Nice to meet you , Toni Soriano'],
+    ['role' => 'user', 'content' => 'where I live ?'],
+];
+
+$response = Ollama::agent('You know me really well!')
+    ->model('llama2')
+    ->chat($messages);
+
+// "You mentioned that you live in Spain."
+
+```
+
 ### Show Model Information
 
 ```php

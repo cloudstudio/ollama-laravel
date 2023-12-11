@@ -12,15 +12,67 @@ class Ollama
 {
     use MakesHttpRequests;
 
+    /**
+     * modelService
+     *
+     * @var mixed
+     */
     protected $modelService;
+
+    /**
+     * selectedModel
+     *
+     * @var mixed
+     */
     protected $selectedModel;
 
+    /**
+     * model
+     *
+     * @var mixed
+     */
     protected $model;
+
+    /**
+     * prompt
+     *
+     * @var mixed
+     */
     protected $prompt;
+
+    /**
+     * format
+     *
+     * @var mixed
+     */
     protected $format;
+
+    /**
+     * options
+     *
+     * @var mixed
+     */
     protected $options;
+
+    /**
+     * stream
+     *
+     * @var bool
+     */
     protected $stream = false;
+
+    /**
+     * raw
+     *
+     * @var mixed
+     */
     protected $raw;
+
+    /**
+     * agent
+     *
+     * @var mixed
+     */
     protected $agent;
 
     /**
@@ -201,6 +253,23 @@ class Ollama
             'options' => $this->options,
             'stream' => $this->stream,
             'raw' => $this->raw,
+        ]);
+    }
+
+    /**
+     * Generates a chat completion using the specified model and conversation.
+     *
+     * @param array $conversation
+     * @return array
+     */
+    public function chat(array $conversation)
+    {
+        return $this->sendRequest('/api/chat', [
+            'model' => $this->model,
+            'messages' => $conversation,
+            'format' => $this->format,
+            'options' => $this->options,
+            'stream' => $this->stream,
         ]);
     }
 }
