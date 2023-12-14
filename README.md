@@ -44,7 +44,7 @@ $response = Ollama::agent('You are a weather expert...')
 ```
 
 
-### Vision support
+### Vision Support
     
 ```php
 $response = Ollama::model('llava:13b')
@@ -56,7 +56,7 @@ $response = Ollama::model('llava:13b')
 
 ```
 
-### Chat completion
+### Chat Completion
 
 ```php
 $messages = [
