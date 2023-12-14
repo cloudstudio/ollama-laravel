@@ -43,6 +43,19 @@ $response = Ollama::agent('You are a weather expert...')
     ->ask();
 ```
 
+
+### Vision support
+    
+```php
+$response = Ollama::model('llava:13b')
+    ->prompt('What is in this picture?')
+    ->image(public_path('images/example.jpg')) 
+    ->ask();
+
+// "The image features a close-up of a person's hand, wearing bright pink fingernail polish and blue nail polish. In addition to the colorful nails, the hand has two tattoos – one is a cross and the other is an eye."
+
+```
+
 ### Chat completion
 
 ```php
