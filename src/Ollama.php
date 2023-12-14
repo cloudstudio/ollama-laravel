@@ -4,6 +4,7 @@ namespace Cloudstudio\Ollama;
 
 use Cloudstudio\Ollama\Services\ModelService;
 use Cloudstudio\Ollama\Traits\MakesHttpRequests;
+use Illuminate\Support\Facades\Storage;
 
 /**
  * Ollama class for integration with Laravel.
@@ -74,6 +75,13 @@ class Ollama
      * @var mixed
      */
     protected $agent;
+
+    /**
+     * Base64 encoded image.
+     *
+     * @var string|null
+     */
+    protected $image = null;
 
     /**
      * Ollama class constructor.
@@ -227,6 +235,24 @@ class Ollama
     }
 
     /**
+     * Sets an image for generation.
+     *
+     * @param string $imagePath
+     * @return $this
+     * @throws \Exception
+     */
+    public function image(string $imagePath)
+    {
+        if (!file_exists($imagePath)) {
+            throw new \Exception("Image file does not exist: $imagePath");
+        }
+
+        $this->image = base64_encode(file_get_contents($imagePath));
+        return $this;
+    }
+
+
+    /**
      * Generates embeddings from the selected model.
      *
      * @param string $prompt
@@ -245,7 +271,7 @@ class Ollama
      */
     public function ask()
     {
-        return $this->sendRequest('/api/generate', [
+        $requestData = [
             'model' => $this->model,
             'system' => $this->agent,
             'prompt' => $this->prompt,
@@ -253,7 +279,13 @@ class Ollama
             'options' => $this->options,
             'stream' => $this->stream,
             'raw' => $this->raw,
-        ]);
+        ];
+
+        if ($this->image) {
+            $requestData['images'] = [$this->image];
+        }
+
+        return $this->sendRequest('/api/generate', $requestData);
     }
 
     /**
