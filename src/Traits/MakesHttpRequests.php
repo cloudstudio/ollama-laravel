@@ -3,6 +3,7 @@
 namespace Cloudstudio\Ollama\Traits;
 
 use Illuminate\Support\Facades\Http;
+use GuzzleHttp\Client;
 
 trait MakesHttpRequests
 {
@@ -17,8 +18,19 @@ trait MakesHttpRequests
     protected function sendRequest(string $urlSuffix, array $data, string $method = 'post')
     {
         $url = config('ollama-laravel.url') . $urlSuffix;
-        $response = Http::timeout(config('ollama-laravel.connection.timeout'))->$method($url, $data);
 
-        return $response->json();
+        if (!empty($data['stream']) && $data['stream'] === true) {
+            $client = new Client();
+            $response = $client->request($method, $url, [
+                'json' => $data,
+                'stream' => true,
+                'timeout' => config('ollama-laravel.connection.timeout'),
+            ]);
+
+            return $response;
+        } else {
+            $response = Http::timeout(config('ollama-laravel.connection.timeout'))->$method($url, $data);
+            return $response->json();
+        }
     }
 }
