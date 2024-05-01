@@ -84,6 +84,13 @@ class Ollama
     protected $image = null;
 
     /**
+    * keep alive
+    *
+    * @ var mixed
+    */
+    protected $keepAlive = "5m";
+
+    /**
      * Ollama class constructor.
      */
     public function __construct(ModelService $modelService)
@@ -174,6 +181,18 @@ class Ollama
     public function raw(bool $raw)
     {
         $this->raw = $raw;
+        return $this;
+    }
+
+    /**
+    * Controls how long the model will stay loaded into memory following the request
+    *
+    * @param string $keepAlive
+    * @return $this
+    */
+    public function keepAlive(string $keepAlive)
+    {
+        $this->keepAlive = $keepAlive;
         return $this;
     }
 
@@ -279,6 +298,7 @@ class Ollama
             'options' => $this->options,
             'stream' => $this->stream,
             'raw' => $this->raw,
+            'keep_alive'=> $this->keepAlive,
         ];
 
         if ($this->image) {
