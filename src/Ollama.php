@@ -96,7 +96,7 @@ class Ollama
     public function __construct(ModelService $modelService)
     {
         $this->modelService = $modelService;
-        $this->model = config('ollama.model');
+        $this->model = config('ollama-laravel.model');
     }
 
     /**
