@@ -41,6 +41,7 @@ return [
 ```php
 use Cloudstudio\Ollama\Facades\Ollama;
 
+/** @var array $response */
 $response = Ollama::agent('You are a weather expert...')
     ->prompt('Why is the sky blue?')
     ->model('llama2')
@@ -53,6 +54,7 @@ $response = Ollama::agent('You are a weather expert...')
 ### Vision Support
     
 ```php
+/** @var array $response */
 $response = Ollama::model('llava:13b')
     ->prompt('What is in this picture?')
     ->image(public_path('images/example.jpg')) 
@@ -76,6 +78,33 @@ $response = Ollama::agent('You know me really well!')
     ->chat($messages);
 
 // "You mentioned that you live in Spain."
+
+```
+
+
+### Streamable responses
+
+```php
+
+use Cloudstudio\Ollama\Facades\Ollama;
+use Illuminate\Console\BufferedConsoleOutput;
+
+/** @var \GuzzleHttp\Psr7\Response $response */
+$response = Ollama::agent('You are a snarky friend with one-line responses')
+    ->prompt("I didn't sleep much last night")
+    ->model('llama3')
+    ->options(['temperature' => 0.1])
+    ->stream(true)
+    ->ask();
+
+$output = new BufferedConsoleOutput();
+$responses = Ollama::processStream($response->getBody(), function($data) use ($output) {
+    $output->write($data['response']);
+});
+
+$output->write("\n");
+$complete = implode('', array_column($responses, 'response'));
+$output->write("<info>$complete</info>");
 
 ```
 
