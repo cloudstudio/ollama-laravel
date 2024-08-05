@@ -4,8 +4,10 @@ namespace Cloudstudio\Ollama;
 
 use Cloudstudio\Ollama\Services\ModelService;
 use Cloudstudio\Ollama\Traits\MakesHttpRequests;
+use Cloudstudio\Ollama\Traits\StreamHelper;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Support\Facades\Storage;
+use Psr\Http\Message\StreamInterface;
 
 /**
  * Ollama class for integration with Laravel.
@@ -13,6 +15,7 @@ use Illuminate\Support\Facades\Storage;
 class Ollama
 {
     use MakesHttpRequests;
+    use StreamHelper;
 
     /**
      * modelService
@@ -324,5 +327,16 @@ class Ollama
             'options' => $this->options,
             'stream' => $this->stream,
         ]);
+    }
+
+
+    /**
+     * @param StreamInterface $body
+     * @param \Closure $handleJsonObject
+     * @return array
+     * @throws \Exception
+     */
+    public static function processStream(StreamInterface $body, \Closure $handleJsonObject): array {
+        return self::doProcessStream($body, $handleJsonObject);
     }
 }
