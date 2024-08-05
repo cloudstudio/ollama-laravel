@@ -44,7 +44,7 @@ trait StreamHelper {
                 $handleJsonObject($data);
                 $jsonObjects[] = $data;
             } else {
-                // we shouldn't ever hit this, except maybe when the ollama docker container is unexpectedly killed
+                // we shouldn't hit this, except when ollama is unexpectedly killed
                 throw new \Exception( "Incomplete JSON object remaining: " . $buffer);
             }
         }
