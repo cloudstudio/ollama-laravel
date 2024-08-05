@@ -4,6 +4,7 @@ namespace Cloudstudio\Ollama;
 
 use Cloudstudio\Ollama\Services\ModelService;
 use Cloudstudio\Ollama\Traits\MakesHttpRequests;
+use GuzzleHttp\Psr7\Response;
 use Illuminate\Support\Facades\Storage;
 
 /**
@@ -286,7 +287,7 @@ class Ollama
     /**
      * Generates content using the specified model.
      *
-     * @return array
+     * @return array|Response
      */
     public function ask()
     {
