@@ -5,9 +5,11 @@ namespace Cloudstudio\Ollama\Traits;
 use Psr\Http\Message\StreamInterface;
 
 trait StreamHelper {
-    protected function processStream(StreamInterface $body, \Closure $handleJsonObject) {
+    protected static function doProcessStream(StreamInterface $body, \Closure $handleJsonObject): array {
         // Use a buffer to hold incomplete JSON object parts
         $buffer = '';
+
+        $jsonObjects = [];
 
         while (!$body->eof()) {
             $chunk = $body->read(256);
@@ -25,6 +27,7 @@ trait StreamHelper {
                 // if so, pass the object to the handler
                 if ($data !== null) {
                     $handleJsonObject($data);
+                    $jsonObjects[] = $data;
                 } else {
                     // If JSON decoding fails, it means this is an incomplete object,
                     // So, we append this part back to the buffer to be processed with the next chunk
@@ -39,10 +42,13 @@ trait StreamHelper {
             $data = json_decode($buffer, true);
             if ($data !== null) {
                 $handleJsonObject($data);
+                $jsonObjects[] = $data;
             } else {
                 // we shouldn't ever hit this, except maybe when the ollama docker container is unexpectedly killed
                 throw new \Exception( "Incomplete JSON object remaining: " . $buffer);
             }
         }
+
+        return $jsonObjects;
     }
 }
