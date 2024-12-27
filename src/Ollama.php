@@ -56,6 +56,13 @@ class Ollama
     protected $options;
 
     /**
+     * options
+     *
+     * @var mixed
+     */
+    protected $tools;
+
+    /**
      * stream
      *
      * @var bool
@@ -169,6 +176,18 @@ class Ollama
     public function stream(bool $stream = false)
     {
         $this->stream = $stream;
+        return $this;
+    }
+
+    /**
+     * Sets tools for generation if supported in chat.
+     *
+     * @param array $tools
+     * @return $this
+     */
+    public function tools(array $tools = [])
+    {
+        $this->tools = $tools;
         return $this;
     }
 
@@ -322,6 +341,7 @@ class Ollama
             'format' => $this->format,
             'options' => $this->options,
             'stream' => $this->stream,
+            'tools' => $this->tools,
         ]);
     }
 }
