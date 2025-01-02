@@ -77,6 +77,43 @@ $response = Ollama::agent('You know me really well!')
 
 // "You mentioned that you live in Spain."
 
+### Chat Completion
+
+```
+### Chat Completion with tools
+
+```php
+$messages = [
+    ['role' => 'user', 'content' => 'What is the weather in Toronto?'],
+];
+
+$response = Ollama::model('llama3.1')
+    ->tools([
+        [
+            "type"     => "function",
+            "function" => [
+                "name"        => "get_current_weather",
+                "description" => "Get the current weather for a location",
+                "parameters"  => [
+                    "type"       => "object",
+                    "properties" => [
+                        "location" => [
+                            "type"        => "string",
+                            "description" => "The location to get the weather for, e.g. San Francisco, CA",
+                        ],
+                        "format"   => [
+                            "type"        => "string",
+                            "description" => "The format to return the weather in, e.g. 'celsius' or 'fahrenheit'",
+                            "enum"        => ["celsius", "fahrenheit"],
+                        ],
+                    ],
+                    "required"   => ["location", "format"],
+                ],
+            ],
+        ],
+    ])
+    ->chat($messages);
+
 ```
 
 ### Show Model Information
