@@ -2,6 +2,7 @@
 
 namespace Cloudstudio\Ollama\Traits;
 
+use GuzzleHttp\Psr7\Response;
 use Illuminate\Support\Facades\Http;
 use GuzzleHttp\Client;
 
@@ -13,7 +14,7 @@ trait MakesHttpRequests
      * @param string $urlSuffix
      * @param array $data
      * @param string $method (optional)
-     * @return array
+     * @return array|Response
      */
     protected function sendRequest(string $urlSuffix, array $data, string $method = 'post')
     {
