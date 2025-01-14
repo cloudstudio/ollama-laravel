@@ -6,7 +6,7 @@ Ollama-Laravel is a Laravel package that provides a seamless integration with th
 ## If you use laravel 10.x, please use the following version V1.0.9
 
 ```bash
-https://github.com/cloudstudio/ollama-laravel/releases/tag/v1.0.5
+https://github.com/cloudstudio/ollama-laravel/releases/tag/v1.0.9
 ```
 
 ## Installation
