@@ -91,10 +91,17 @@ class Ollama
     protected $image = null;
 
     /**
-    * keep alive
-    *
-    * @ var mixed
-    */
+     * Base64 encoded images.
+     *
+     * @var array|null
+     */
+    protected $images = [];
+
+    /**
+     * keep alive
+     *
+     * @ var mixed
+     */
     protected $keepAlive = "5m";
 
     /**
@@ -204,11 +211,11 @@ class Ollama
     }
 
     /**
-    * Controls how long the model will stay loaded into memory following the request
-    *
-    * @param string $keepAlive
-    * @return $this
-    */
+     * Controls how long the model will stay loaded into memory following the request
+     *
+     * @param string $keepAlive
+     * @return $this
+     */
     public function keepAlive(string $keepAlive)
     {
         $this->keepAlive = $keepAlive;
@@ -289,6 +296,26 @@ class Ollama
         return $this;
     }
 
+    /**
+     * Sets images for generation.
+     *
+     * @param array $imagePaths
+     * @return $this
+     * @throws \Exception
+     */
+    public function images(array $imagePaths)
+    {
+        foreach ($imagePaths as $imagePath) {
+            if (!file_exists($imagePath)) {
+                throw new \Exception("Image file does not exist: $imagePath");
+            }
+
+            $this->images[] = base64_encode(file_get_contents($imagePath));
+        }
+
+        return $this;
+    }
+
 
     /**
      * Generates embeddings from the selected model.
@@ -317,12 +344,17 @@ class Ollama
             'options' => $this->options,
             'stream' => $this->stream,
             'raw' => $this->raw,
-            'keep_alive'=> $this->keepAlive,
+            'keep_alive' => $this->keepAlive,
         ];
 
         if ($this->image) {
             $requestData['images'] = [$this->image];
         }
+
+        if ($this->images) {
+            $requestData['images'] = $this->images;
+        }
+
 
         return $this->sendRequest('/api/generate', $requestData);
     }
