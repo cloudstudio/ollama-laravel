@@ -3,10 +3,10 @@
 
 Ollama-Laravel is a Laravel package that provides a seamless integration with the [Ollama API](https://github.com/jmorganca/ollama). It includes functionalities for model management, prompt generation, format setting, and more. This package is perfect for developers looking to leverage the power of the Ollama API in their Laravel applications.
 
-## If you use laravel 10.x, please use the following version V1.0.5
+## If you use laravel 10.x, please use the following version V1.0.9
 
 ```bash
-https://github.com/cloudstudio/ollama-laravel/releases/tag/v1.0.5
+https://github.com/cloudstudio/ollama-laravel/releases/tag/v1.0.9
 ```
 
 ## Installation
@@ -41,6 +41,7 @@ return [
 ```php
 use Cloudstudio\Ollama\Facades\Ollama;
 
+/** @var array $response */
 $response = Ollama::agent('You are a weather expert...')
     ->prompt('Why is the sky blue?')
     ->model('llama2')
@@ -53,6 +54,7 @@ $response = Ollama::agent('You are a weather expert...')
 ### Vision Support
     
 ```php
+/** @var array $response */
 $response = Ollama::model('llava:13b')
     ->prompt('What is in this picture?')
     ->image(public_path('images/example.jpg')) 
@@ -113,6 +115,33 @@ $response = Ollama::model('llama3.1')
         ],
     ])
     ->chat($messages);
+
+```
+
+
+### Streamable responses
+
+```php
+
+use Cloudstudio\Ollama\Facades\Ollama;
+use Illuminate\Console\BufferedConsoleOutput;
+
+/** @var \GuzzleHttp\Psr7\Response $response */
+$response = Ollama::agent('You are a snarky friend with one-line responses')
+    ->prompt("I didn't sleep much last night")
+    ->model('llama3')
+    ->options(['temperature' => 0.1])
+    ->stream(true)
+    ->ask();
+
+$output = new BufferedConsoleOutput();
+$responses = Ollama::processStream($response->getBody(), function($data) use ($output) {
+    $output->write($data['response']);
+});
+
+$output->write("\n");
+$complete = implode('', array_column($responses, 'response'));
+$output->write("<info>$complete</info>");
 
 ```
 
