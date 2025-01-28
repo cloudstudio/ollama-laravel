@@ -46,11 +46,21 @@ return [
 
 ### Authentication
 
-The package supports both Basic Authentication and Bearer Token Authentication.
+> **Note:** The Ollama server itself does not include built-in authentication. The authentication features in this package are designed to work with reverse proxy setups (like Nginx, Caddy, or Apache) that add authentication in front of your Ollama server.
+
+The package supports both Basic Authentication and Bearer Token Authentication when accessing Ollama through a reverse proxy. This is particularly useful when:
+- Deploying Ollama in a production environment
+- Securing access to your Ollama instance
+- Running Ollama behind a corporate firewall
+
+Common reverse proxy setups:
+- Nginx with basic auth or token validation
+- Caddy with authentication middleware
+- Apache with auth modules
 
 #### Basic Authentication
 
-To use Basic Authentication, set the following environment variables:
+To use Basic Authentication with your reverse proxy, set the following environment variables:
 
 ```env
 OLLAMA_AUTH_TYPE=basic
@@ -188,46 +198,3 @@ $complete = implode('', array_column($responses, 'response'));
 $output->write("<info>$complete</info>");
 
 ```
-
-### Show Model Information
-
-```php
-$response = Ollama::model('Llama2')->show();
-```
-
-### Copy a Model
-
-```php
-Ollama::model('Llama2')->copy('NewModel');
-```
-
-### Delete a Model
-
-```php
-Ollama::model('Llama2')->delete();
-```
-
-### Generate Embeddings
-
-```php
-$embeddings = Ollama::model('Llama2')->embeddings('Your prompt here');
-```
-
-## Testing
-
-```bash
-pest
-```
-
-## Changelog, Contributing, and Security
-
-- [Changelog](CHANGELOG.md)
-- [Contributing](CONTRIBUTING.md)
-
-## Credits
-
-- [Toni Soriano](https://github.com/cloudstudio)
-
-## License
-
-[MIT License](LICENSE.md)
