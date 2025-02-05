@@ -13,28 +13,68 @@ use InvalidArgumentException;
 trait MakesHttpRequests
 {
     /**
-     * Get request headers including authentication if configured.
+     * Get request headers including authentication and additional custom headers.
+     *
+     * @return array
      */
     protected function getHeaders(): array
     {
-        $headers = [];
+        $customHeaders = config('ollama-laravel.headers', []);
+
+        $authHeaders = $this->getAuthenticationHeaders();
+
+        return array_merge($authHeaders, $customHeaders);
+    }
+
+    /**
+     * Retrieve the authentication headers based on the configured authentication type.
+     *
+     * @return array
+     */
+    protected function getAuthenticationHeaders(): array
+    {
         $authType = config('ollama-laravel.auth.type');
 
-        if ($authType === 'bearer') {
-            if (!config('ollama-laravel.auth.token')) {
-                throw new InvalidArgumentException('Bearer token is required when using token authentication');
-            }
-            $headers['Authorization'] = 'Bearer ' . config('ollama-laravel.auth.token');
-        } elseif ($authType === 'basic') {
-            if (!config('ollama-laravel.auth.username') || !config('ollama-laravel.auth.password')) {
-                throw new InvalidArgumentException('Username and password are required when using basic authentication');
-            }
-            $headers['Authorization'] = 'Basic ' . base64_encode(
-                config('ollama-laravel.auth.username') . ':' . config('ollama-laravel.auth.password')
-            );
+        switch ($authType) {
+            case 'bearer':
+                return $this->getBearerHeader();
+            case 'basic':
+                return $this->getBasicHeader();
+            default:
+                return [];
         }
+    }
 
-        return array_merge($headers, config('ollama-laravel.headers', []));
+    /**
+     * Build the Bearer authentication header.
+     *
+     * @return array
+     * @throws InvalidArgumentException
+     */
+    protected function getBearerHeader(): array
+    {
+        $token = config('ollama-laravel.auth.token');
+        if (!$token) {
+            throw new InvalidArgumentException('Bearer token is required when using token authentication');
+        }
+        return ['Authorization' => 'Bearer ' . $token];
+    }
+
+    /**
+     * Build the Basic authentication header.
+     *
+     * @return array
+     * @throws InvalidArgumentException
+     */
+    protected function getBasicHeader(): array
+    {
+        $username = config('ollama-laravel.auth.username');
+        $password = config('ollama-laravel.auth.password');
+        if (!$username || !$password) {
+            throw new InvalidArgumentException('Username and password are required when using basic authentication');
+        }
+        $credentials = base64_encode($username . ':' . $password);
+        return ['Authorization' => 'Basic ' . $credentials];
     }
 
     /**
@@ -54,11 +94,11 @@ trait MakesHttpRequests
         if (!empty($data['stream']) && $data['stream'] === true) {
             $client = new Client();
             $options = [
-                'json' => $data,
-                'stream' => true,
+                'json'    => $data,
+                'stream'  => true,
                 'timeout' => config('ollama-laravel.connection.timeout'),
                 'headers' => $headers,
-                'verify' => config('ollama-laravel.connection.verify_ssl', true),
+                'verify'  => config('ollama-laravel.connection.verify_ssl', true),
             ];
 
             return $client->request($method, $url, $options);
