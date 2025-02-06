@@ -1,4 +1,3 @@
-
 # Ollama-Laravel Package
 
 Ollama-Laravel is a Laravel package that provides a seamless integration with the [Ollama API](https://github.com/jmorganca/ollama). It includes functionalities for model management, prompt generation, format setting, and more. This package is perfect for developers looking to leverage the power of the Ollama API in their Laravel applications.
@@ -30,8 +29,63 @@ return [
     'default_prompt' => env('OLLAMA_DEFAULT_PROMPT', 'Hello, how can I assist you today?'),
     'connection' => [
         'timeout' => env('OLLAMA_CONNECTION_TIMEOUT', 300),
+        'verify_ssl' => env('OLLAMA_VERIFY_SSL', true),
+        'auth' => [
+            'type' => env('OLLAMA_AUTH_TYPE', null), // 'basic' or 'bearer'
+            'username' => env('OLLAMA_AUTH_USERNAME', null),
+            'password' => env('OLLAMA_AUTH_PASSWORD', null),
+            'token' => env('OLLAMA_AUTH_TOKEN', null),
+        ],
+        'headers' => [
+            // Add any custom headers here
+            // 'X-Custom-Header' => 'value',
+        ],
     ],
 ];
+```
+
+### Authentication
+
+> **Note:** The Ollama server itself does not include built-in authentication. The authentication features in this package are designed to work with reverse proxy setups (like Nginx, Caddy, or Apache) that add authentication in front of your Ollama server.
+
+The package supports both Basic Authentication and Bearer Token Authentication when accessing Ollama through a reverse proxy. This is particularly useful when:
+- Deploying Ollama in a production environment
+- Securing access to your Ollama instance
+- Running Ollama behind a corporate firewall
+
+Common reverse proxy setups:
+- Nginx with basic auth or token validation
+- Caddy with authentication middleware
+- Apache with auth modules
+
+#### Basic Authentication
+
+To use Basic Authentication with your reverse proxy, set the following environment variables:
+
+```env
+OLLAMA_AUTH_TYPE=basic
+OLLAMA_AUTH_USERNAME=your_username
+OLLAMA_AUTH_PASSWORD=your_password
+```
+
+#### Bearer Token Authentication
+
+To use Bearer Token Authentication, set the following environment variables:
+
+```env
+OLLAMA_AUTH_TYPE=bearer
+OLLAMA_AUTH_TOKEN=your_bearer_token
+```
+
+#### Custom Headers
+
+You can add custom headers in the configuration file:
+
+```php
+'headers' => [
+    'X-Custom-Header' => 'value',
+    'Another-Header' => 'another-value',
+],
 ```
 
 ## Usage
@@ -144,46 +198,3 @@ $complete = implode('', array_column($responses, 'response'));
 $output->write("<info>$complete</info>");
 
 ```
-
-### Show Model Information
-
-```php
-$response = Ollama::model('Llama2')->show();
-```
-
-### Copy a Model
-
-```php
-Ollama::model('Llama2')->copy('NewModel');
-```
-
-### Delete a Model
-
-```php
-Ollama::model('Llama2')->delete();
-```
-
-### Generate Embeddings
-
-```php
-$embeddings = Ollama::model('Llama2')->embeddings('Your prompt here');
-```
-
-## Testing
-
-```bash
-pest
-```
-
-## Changelog, Contributing, and Security
-
-- [Changelog](CHANGELOG.md)
-- [Contributing](CONTRIBUTING.md)
-
-## Credits
-
-- [Toni Soriano](https://github.com/cloudstudio)
-
-## License
-
-[MIT License](LICENSE.md)
