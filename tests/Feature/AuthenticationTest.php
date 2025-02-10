@@ -4,12 +4,11 @@ use Cloudstudio\Ollama\Ollama;
 use Cloudstudio\Ollama\Services\ModelService;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Http;
-use InvalidArgumentException;
 
 beforeEach(function () {
     Config::set('ollama-laravel.model', 'llama2');
     $this->ollama = new Ollama(new ModelService());
-    
+
     Http::fake([
         '*' => Http::response(['success' => true], 200),
     ]);
