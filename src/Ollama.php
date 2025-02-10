@@ -2,12 +2,14 @@
 
 namespace Cloudstudio\Ollama;
 
+use Closure;
 use Cloudstudio\Ollama\Services\ModelService;
 use Cloudstudio\Ollama\Traits\MakesHttpRequests;
 use Cloudstudio\Ollama\Traits\StreamHelper;
+use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Psr7\Response;
-use Illuminate\Support\Facades\Storage;
 use Psr\Http\Message\StreamInterface;
+use Exception;
 
 /**
  * Ollama class for integration with Laravel.
@@ -22,91 +24,91 @@ class Ollama
      *
      * @var mixed
      */
-    protected $modelService;
+    protected ModelService $modelService;
 
     /**
      * selectedModel
      *
      * @var mixed
      */
-    protected $selectedModel;
+    protected string $selectedModel;
 
     /**
      * model
      *
      * @var mixed
      */
-    protected $model;
+    protected string $model;
 
     /**
      * prompt
      *
      * @var mixed
      */
-    protected $prompt;
+    protected ?string $prompt = null;
 
     /**
      * format
      *
      * @var mixed
      */
-    protected $format;
+    protected ?string $format = null;
 
     /**
      * options
      *
      * @var mixed
      */
-    protected $options;
+    protected ?array $options = null;
 
     /**
      * options
      *
      * @var mixed
      */
-    protected $tools;
+    protected ?array $tools = null;
 
     /**
      * stream
      *
      * @var bool
      */
-    protected $stream = false;
+    protected bool $stream = false;
 
     /**
      * raw
      *
      * @var mixed
      */
-    protected $raw;
+    protected ?bool $raw = null;
 
     /**
      * agent
      *
      * @var mixed
      */
-    protected $agent;
+    protected ?string $agent = null;
 
     /**
      * Base64 encoded image.
      *
      * @var string|null
      */
-    protected $image = null;
+    protected ?string $image = null;
 
     /**
      * Base64 encoded images.
      *
      * @var array|null
      */
-    protected $images = [];
+    protected ?array $images = [];
 
     /**
      * keep alive
      *
      * @ var mixed
      */
-    protected $keepAlive = "5m";
+    protected string $keepAlive = "5m";
 
     /**
      * Ollama class constructor.
@@ -114,7 +116,8 @@ class Ollama
     public function __construct(ModelService $modelService)
     {
         $this->modelService = $modelService;
-        $this->model = config('ollama-laravel.model');
+        $this->model = config('ollama-laravel.model', 'llama2');
+        $this->selectedModel = $this->model;
     }
 
     /**
@@ -123,7 +126,7 @@ class Ollama
      * @param string $agent
      * @return $this
      */
-    public function agent(string $agent)
+    public function agent(string $agent): Ollama
     {
         $this->agent = $agent;
         return $this;
@@ -135,7 +138,7 @@ class Ollama
      * @param string $prompt
      * @return $this
      */
-    public function prompt(string $prompt)
+    public function prompt(string $prompt): Ollama
     {
         $this->prompt = $prompt;
         return $this;
@@ -147,7 +150,7 @@ class Ollama
      * @param string $model
      * @return $this
      */
-    public function model(string $model)
+    public function model(string $model): Ollama
     {
         $this->selectedModel = $model;
         $this->model = $model;
@@ -160,7 +163,7 @@ class Ollama
      * @param string $format
      * @return $this
      */
-    public function format(string $format)
+    public function format(string $format): Ollama
     {
         $this->format = $format;
         return $this;
@@ -172,7 +175,7 @@ class Ollama
      * @param array $options
      * @return $this
      */
-    public function options(array $options = [])
+    public function options(array $options = []): Ollama
     {
         $this->options = $options;
         return $this;
@@ -184,7 +187,7 @@ class Ollama
      * @param bool $stream
      * @return $this
      */
-    public function stream(bool $stream = false)
+    public function stream(bool $stream = false): Ollama
     {
         $this->stream = $stream;
         return $this;
@@ -196,7 +199,7 @@ class Ollama
      * @param array $tools
      * @return $this
      */
-    public function tools(array $tools = [])
+    public function tools(array $tools = []): Ollama
     {
         $this->tools = $tools;
         return $this;
@@ -208,7 +211,7 @@ class Ollama
      * @param bool $raw
      * @return $this
      */
-    public function raw(bool $raw)
+    public function raw(bool $raw): Ollama
     {
         $this->raw = $raw;
         return $this;
@@ -220,7 +223,7 @@ class Ollama
      * @param string $keepAlive
      * @return $this
      */
-    public function keepAlive(string $keepAlive)
+    public function keepAlive(string $keepAlive): Ollama
     {
         $this->keepAlive = $keepAlive;
         return $this;
@@ -230,8 +233,9 @@ class Ollama
      * Lists available local models.
      *
      * @return array
+     * @throws GuzzleException
      */
-    public function models()
+    public function models(): array
     {
         return $this->modelService->listLocalModels();
     }
@@ -240,8 +244,9 @@ class Ollama
      * Shows information about the selected model.
      *
      * @return array
+     * @throws GuzzleException
      */
-    public function show()
+    public function show(): array
     {
         return $this->modelService->showModelInformation($this->selectedModel);
     }
@@ -251,9 +256,9 @@ class Ollama
      *
      * @param string $destination
      * @return $this
-     * @throws \Exception
+     * @throws Exception|GuzzleException
      */
-    public function copy(string $destination)
+    public function copy(string $destination): Ollama
     {
         $this->modelService->copyModel($this->selectedModel, $destination);
         return $this;
@@ -263,9 +268,9 @@ class Ollama
      * Deletes a model.
      *
      * @return $this
-     * @throws \Exception
+     * @throws Exception|GuzzleException
      */
-    public function delete()
+    public function delete(): Ollama
     {
         $this->modelService->deleteModel($this->selectedModel);
         return $this;
@@ -275,9 +280,9 @@ class Ollama
      * Pulls a model.
      *
      * @return $this
-     * @throws \Exception
+     * @throws Exception|GuzzleException
      */
-    public function pull()
+    public function pull(): Ollama
     {
         $this->modelService->pullModel($this->selectedModel);
         return $this;
@@ -288,12 +293,12 @@ class Ollama
      *
      * @param string $imagePath
      * @return $this
-     * @throws \Exception
+     * @throws Exception
      */
-    public function image(string $imagePath)
+    public function image(string $imagePath): Ollama
     {
         if (!file_exists($imagePath)) {
-            throw new \Exception("Image file does not exist: $imagePath");
+            throw new Exception("Image file does not exist: $imagePath");
         }
 
         $this->image = base64_encode(file_get_contents($imagePath));
@@ -305,13 +310,13 @@ class Ollama
      *
      * @param array $imagePaths
      * @return $this
-     * @throws \Exception
+     * @throws Exception
      */
-    public function images(array $imagePaths)
+    public function images(array $imagePaths): Ollama
     {
         foreach ($imagePaths as $imagePath) {
             if (!file_exists($imagePath)) {
-                throw new \Exception("Image file does not exist: $imagePath");
+                throw new Exception("Image file does not exist: $imagePath");
             }
 
             $this->images[] = base64_encode(file_get_contents($imagePath));
@@ -320,15 +325,15 @@ class Ollama
         return $this;
     }
 
-
     /**
      * Generates embeddings from the selected model.
      *
      * @param string $prompt
      * @return array
-     * @throws \Exception
+     * @throws Exception
+     * @throws GuzzleException
      */
-    public function embeddings(string $prompt)
+    public function embeddings(string $prompt): array
     {
         return $this->modelService->generateEmbeddings($this->selectedModel, $prompt);
     }
@@ -337,8 +342,9 @@ class Ollama
      * Generates content using the specified model.
      *
      * @return array|Response
+     * @throws GuzzleException
      */
-    public function ask()
+    public function ask(): array|Response
     {
         $requestData = [
             'model' => $this->model,
@@ -367,9 +373,10 @@ class Ollama
      * Generates a chat completion using the specified model and conversation.
      *
      * @param array $conversation
-     * @return array
+     * @return array|Response
+     * @throws GuzzleException
      */
-    public function chat(array $conversation)
+    public function chat(array $conversation): array|Response
     {
         return $this->sendRequest('/api/chat', [
             'model' => $this->model,
@@ -384,11 +391,11 @@ class Ollama
 
     /**
      * @param StreamInterface $body
-     * @param \Closure $handleJsonObject
+     * @param Closure $handleJsonObject
      * @return array
-     * @throws \Exception
+     * @throws Exception
      */
-    public static function processStream(StreamInterface $body, \Closure $handleJsonObject): array {
+    public static function processStream(StreamInterface $body, Closure $handleJsonObject): array {
         return self::doProcessStream($body, $handleJsonObject);
     }
 }

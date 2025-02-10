@@ -2,10 +2,11 @@
 
 namespace Cloudstudio\Ollama;
 
+use Cloudstudio\Ollama\Services\ModelService;
+use Illuminate\Foundation\Application;
+use Spatie\LaravelPackageTools\Exceptions\InvalidPackage;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
-use Cloudstudio\Ollama\Commands\OllamaCommand;
-use Cloudstudio\Ollama\Ollama;
 
 class OllamaServiceProvider extends PackageServiceProvider
 {
@@ -25,13 +26,20 @@ class OllamaServiceProvider extends PackageServiceProvider
      * Method register
      *
      * @return void
+     * @throws InvalidPackage
      */
-    public function register()
+    public function register(): void
     {
         parent::register();
 
-        $this->app->singleton(OllamaService::class, function ($app) {
-            return new Ollama();
+        $this->app->singleton(ModelService::class, function () {
+            return new ModelService();
+        });
+
+        $this->app->singleton(Ollama::class, function (Application $app) {
+            return new Ollama(
+                $app->make(ModelService::class)
+            );
         });
     }
 }

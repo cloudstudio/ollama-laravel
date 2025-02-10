@@ -3,8 +3,13 @@
 namespace Cloudstudio\Ollama\Traits;
 
 use Psr\Http\Message\StreamInterface;
+use Exception;
 
 trait StreamHelper {
+
+    /**
+     * @throws Exception
+     */
     protected static function doProcessStream(StreamInterface $body, \Closure $handleJsonObject): array {
         // Use a buffer to hold incomplete JSON object parts
         $buffer = '';
@@ -45,7 +50,7 @@ trait StreamHelper {
                 $jsonObjects[] = $data;
             } else {
                 // we shouldn't hit this, except when ollama is unexpectedly killed
-                throw new \Exception( "Incomplete JSON object remaining: " . $buffer);
+                throw new Exception( "Incomplete JSON object remaining: " . $buffer);
             }
         }
 
