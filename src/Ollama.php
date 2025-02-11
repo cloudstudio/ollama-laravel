@@ -14,57 +14,57 @@ use Exception;
 /**
  * Ollama class for integration with Laravel.
  */
-class Ollama
-{
+class Ollama {
+
     use MakesHttpRequests;
     use StreamHelper;
 
     /**
      * modelService
      *
-     * @var mixed
+     * @var ModelService
      */
     protected ModelService $modelService;
 
     /**
      * selectedModel
      *
-     * @var mixed
+     * @var string
      */
     protected string $selectedModel;
 
     /**
      * model
      *
-     * @var mixed
+     * @var string
      */
     protected string $model;
 
     /**
      * prompt
      *
-     * @var mixed
+     * @var null | string
      */
     protected ?string $prompt = null;
 
     /**
      * format
      *
-     * @var mixed
+     * @var null | string
      */
     protected ?string $format = null;
 
     /**
      * options
      *
-     * @var mixed
+     * @var null | array
      */
     protected ?array $options = null;
 
     /**
      * options
      *
-     * @var mixed
+     * @var null | array
      */
     protected ?array $tools = null;
 
@@ -78,35 +78,35 @@ class Ollama
     /**
      * raw
      *
-     * @var mixed
+     * @var null | bool
      */
     protected ?bool $raw = null;
 
     /**
      * agent
      *
-     * @var mixed
+     * @var null | string
      */
     protected ?string $agent = null;
 
     /**
      * Base64 encoded image.
      *
-     * @var string|null
+     * @var null | string
      */
     protected ?string $image = null;
 
     /**
      * Base64 encoded images.
      *
-     * @var array|null
+     * @var null | array
      */
     protected ?array $images = [];
 
     /**
      * keep alive
      *
-     * @ var mixed
+     * @var string
      */
     protected string $keepAlive = "5m";
 
@@ -129,6 +129,7 @@ class Ollama
     public function agent(string $agent): Ollama
     {
         $this->agent = $agent;
+
         return $this;
     }
 
@@ -141,6 +142,7 @@ class Ollama
     public function prompt(string $prompt): Ollama
     {
         $this->prompt = $prompt;
+
         return $this;
     }
 
@@ -154,6 +156,7 @@ class Ollama
     {
         $this->selectedModel = $model;
         $this->model = $model;
+
         return $this;
     }
 
@@ -166,6 +169,7 @@ class Ollama
     public function format(string $format): Ollama
     {
         $this->format = $format;
+
         return $this;
     }
 
@@ -178,6 +182,7 @@ class Ollama
     public function options(array $options = []): Ollama
     {
         $this->options = $options;
+
         return $this;
     }
 
@@ -190,6 +195,7 @@ class Ollama
     public function stream(bool $stream = false): Ollama
     {
         $this->stream = $stream;
+
         return $this;
     }
 
@@ -202,6 +208,7 @@ class Ollama
     public function tools(array $tools = []): Ollama
     {
         $this->tools = $tools;
+
         return $this;
     }
 
@@ -214,6 +221,7 @@ class Ollama
     public function raw(bool $raw): Ollama
     {
         $this->raw = $raw;
+
         return $this;
     }
 
@@ -226,6 +234,7 @@ class Ollama
     public function keepAlive(string $keepAlive): Ollama
     {
         $this->keepAlive = $keepAlive;
+
         return $this;
     }
 
@@ -261,6 +270,7 @@ class Ollama
     public function copy(string $destination): Ollama
     {
         $this->modelService->copyModel($this->selectedModel, $destination);
+
         return $this;
     }
 
@@ -273,6 +283,7 @@ class Ollama
     public function delete(): Ollama
     {
         $this->modelService->deleteModel($this->selectedModel);
+
         return $this;
     }
 
@@ -285,6 +296,7 @@ class Ollama
     public function pull(): Ollama
     {
         $this->modelService->pullModel($this->selectedModel);
+
         return $this;
     }
 
@@ -302,6 +314,7 @@ class Ollama
         }
 
         $this->image = base64_encode(file_get_contents($imagePath));
+
         return $this;
     }
 
@@ -388,14 +401,14 @@ class Ollama
         ]);
     }
 
-
     /**
      * @param StreamInterface $body
      * @param Closure $handleJsonObject
      * @return array
      * @throws Exception
      */
-    public static function processStream(StreamInterface $body, Closure $handleJsonObject): array {
+    public static function processStream(StreamInterface $body, Closure $handleJsonObject): array
+    {
         return self::doProcessStream($body, $handleJsonObject);
     }
 }
