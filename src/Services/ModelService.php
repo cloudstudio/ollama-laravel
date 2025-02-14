@@ -3,6 +3,7 @@
 namespace Cloudstudio\Ollama\Services;
 
 use Cloudstudio\Ollama\Traits\MakesHttpRequests;
+use GuzzleHttp\Exception\GuzzleException;
 
 class ModelService
 {
@@ -12,7 +13,7 @@ class ModelService
     /**
      * Base URL for the API.
      */
-    protected $baseUrl;
+    protected string $baseUrl;
 
     public function __construct()
     {
@@ -23,8 +24,9 @@ class ModelService
      * List local models.
      *
      * @return array
+     * @throws GuzzleException
      */
-    public function listLocalModels()
+    public function listLocalModels(): array
     {
         return $this->sendRequest('/api/tags', [], 'get');
     }
@@ -34,8 +36,9 @@ class ModelService
      *
      * @param string $modelName
      * @return array
+     * @throws GuzzleException
      */
-    public function showModelInformation(string $modelName)
+    public function showModelInformation(string $modelName): array
     {
         return $this->sendRequest('/api/show', ['name' => $modelName]);
     }
@@ -46,8 +49,9 @@ class ModelService
      * @param string $source
      * @param string $destination
      * @return array
+     * @throws GuzzleException
      */
-    public function copyModel(string $source, string $destination)
+    public function copyModel(string $source, string $destination): array
     {
         return $this->sendRequest('/api/copy', [
             'source' => $source,
@@ -60,8 +64,9 @@ class ModelService
      *
      * @param string $modelName
      * @return array
+     * @throws GuzzleException
      */
-    public function deleteModel(string $modelName)
+    public function deleteModel(string $modelName): array
     {
         return $this->sendRequest('/api/delete', ['name' => $modelName], 'delete');
     }
@@ -71,8 +76,9 @@ class ModelService
      *
      * @param string $modelName
      * @return array
+     * @throws GuzzleException
      */
-    public function pullModel(string $modelName)
+    public function pullModel(string $modelName): array
     {
         return $this->sendRequest('/api/pull', ['name' => $modelName]);
     }
@@ -83,8 +89,9 @@ class ModelService
      * @param string $modelName
      * @param string $prompt
      * @return array
+     * @throws GuzzleException
      */
-    public function generateEmbeddings(string $modelName, string $prompt)
+    public function generateEmbeddings(string $modelName, string $prompt): array
     {
         return $this->sendRequest('/api/embeddings', [
             'model' => $modelName,

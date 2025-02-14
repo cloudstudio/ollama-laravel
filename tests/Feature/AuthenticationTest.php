@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Http;
 
 beforeEach(function () {
+    Config::set('ollama-laravel.model', 'llama2');
     $this->ollama = new Ollama(new ModelService());
 
     Http::fake([
@@ -17,7 +18,7 @@ it('adds bearer token authentication', function () {
     Config::set('ollama-laravel.auth.type', 'bearer');
     Config::set('ollama-laravel.auth.token', 'test-token');
 
-    $this->ollama->model('llama2')
+    $this->ollama
         ->prompt('Test prompt')
         ->ask();
 
@@ -31,7 +32,7 @@ it('adds basic authentication', function () {
     Config::set('ollama-laravel.auth.username', 'user');
     Config::set('ollama-laravel.auth.password', 'pass');
 
-    $this->ollama->model('llama2')
+    $this->ollama
         ->prompt('Test prompt')
         ->ask();
 
@@ -45,7 +46,7 @@ it('throws exception for missing bearer token', function () {
     Config::set('ollama-laravel.auth.type', 'bearer');
     Config::set('ollama-laravel.auth.token', null);
 
-    expect(fn () => $this->ollama->model('llama2')
+    expect(fn () => $this->ollama
         ->prompt('Test prompt')
         ->ask()
     )->toThrow(
@@ -59,7 +60,7 @@ it('throws exception for missing basic auth credentials', function () {
     Config::set('ollama-laravel.auth.username', null);
     Config::set('ollama-laravel.auth.password', null);
 
-    expect(fn () => $this->ollama->model('llama2')
+    expect(fn () => $this->ollama
         ->prompt('Test prompt')
         ->ask()
     )->toThrow(
@@ -71,7 +72,7 @@ it('throws exception for missing basic auth credentials', function () {
 it('works without authentication', function () {
     Config::set('ollama-laravel.auth.type', null);
 
-    $this->ollama->model('llama2')
+    $this->ollama
         ->prompt('Test prompt')
         ->ask();
 
