@@ -3,14 +3,15 @@
 namespace Cloudstudio\Ollama\Facades;
 
 use Illuminate\Support\Facades\Facade;
+use Cloudstudio\Ollama\Ollama as OllamaClient;
 
 /**
- * @see \Cloudstudio\Ollama\Ollama
+ * @see OllamaClient
  */
-class Ollama extends Facade
-{
-    protected static function getFacadeAccessor()
+class Ollama extends Facade {
+
+    protected static function getFacadeAccessor(): string
     {
-        return \Cloudstudio\Ollama\Ollama::class;
+        return OllamaClient::class;
     }
 }
