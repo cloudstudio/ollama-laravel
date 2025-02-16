@@ -10,8 +10,8 @@ use GuzzleHttp\Psr7\Response;
 use Illuminate\Support\Facades\Http;
 use InvalidArgumentException;
 
-trait MakesHttpRequests
-{
+trait MakesHttpRequests {
+
     /**
      * Get request headers including authentication and additional custom headers.
      *
@@ -57,6 +57,7 @@ trait MakesHttpRequests
         if (!$token) {
             throw new InvalidArgumentException('Bearer token is required when using token authentication');
         }
+
         return ['Authorization' => 'Bearer ' . $token];
     }
 
@@ -74,6 +75,7 @@ trait MakesHttpRequests
             throw new InvalidArgumentException('Username and password are required when using basic authentication');
         }
         $credentials = base64_encode($username . ':' . $password);
+
         return ['Authorization' => 'Basic ' . $credentials];
     }
 
@@ -83,10 +85,10 @@ trait MakesHttpRequests
      * @param string $urlSuffix
      * @param array $data
      * @param string $method (optional)
-     * @return array|Response
+     * @return null|array|Response
      * @throws GuzzleException
      */
-    protected function sendRequest(string $urlSuffix, array $data, string $method = 'post'): array|Response
+    protected function sendRequest(string $urlSuffix, array $data, string $method = 'post'): null|array|Response
     {
         $url = config('ollama-laravel.url') . $urlSuffix;
         $headers = $this->getHeaders();
@@ -94,11 +96,11 @@ trait MakesHttpRequests
         if (!empty($data['stream']) && $data['stream'] === true) {
             $client = new Client();
             $options = [
-                'json'    => $data,
-                'stream'  => true,
+                'json' => $data,
+                'stream' => true,
                 'timeout' => config('ollama-laravel.connection.timeout'),
                 'headers' => $headers,
-                'verify'  => config('ollama-laravel.connection.verify_ssl', true),
+                'verify' => config('ollama-laravel.connection.verify_ssl', true),
             ];
 
             return $client->request($method, $url, $options);
