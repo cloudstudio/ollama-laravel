@@ -80,7 +80,7 @@ class ModelService
      */
     public function pullModel(string $modelName): array
     {
-        return $this->sendRequest('/api/pull', ['name' => $modelName]);
+        return $this->sendRequest('/api/pull', ['name' => $modelName, 'stream' => false]);
     }
 
     /**
