@@ -1,5 +1,7 @@
+[![Latest Version on Packagist](https://img.shields.io/packagist/v/cloudstudio/ollama-laravel.svg?style=flat-square)](https://packagist.org/packages/cloudstudio/ollama-laravel)
 
-# Ollama-Laravel Package
+# Ollama-Laravel Package[![Total Downloads](https://img.shields.io/packagist/dt/cloudstudio/ollama-laravel.svg?style=flat-square)](https://packagist.org/packages/cloudstudio/ollama-laravel)
+
 
 Ollama-Laravel is a Laravel package that provides a seamless integration with the [Ollama API](https://github.com/jmorganca/ollama). It includes functionalities for model management, prompt generation, format setting, and more. This package is perfect for developers looking to leverage the power of the Ollama API in their Laravel applications.
 
