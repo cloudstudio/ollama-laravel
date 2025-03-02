@@ -2,8 +2,6 @@
 [![Total Downloads](https://img.shields.io/packagist/dt/cloudstudio/ollama-laravel.svg?style=flat-square)](https://packagist.org/packages/cloudstudio/ollama-laravel)
 
 
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/cloudstudio/ollama-laravel.svg?style=flat-square)](https://packagist.org/packages/cloudstudio/ollama-laravel)
-
 # Ollama-Laravel Package[![Total Downloads](https://img.shields.io/packagist/dt/cloudstudio/ollama-laravel.svg?style=flat-square)](https://packagist.org/packages/cloudstudio/ollama-laravel)
 
 
