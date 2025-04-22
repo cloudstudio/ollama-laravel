@@ -23,6 +23,62 @@ it('sets properties correctly and returns instance', function ($method, $value) 
     'raw' => ['raw', true],
 ]);
 
+it('correctly handles format as string type', function () {
+    $formatString = 'json';
+    
+    $ollama = $this->ollama->format($formatString);
+    
+    // Get the protected property value using reflection
+    $reflection = new ReflectionClass($ollama);
+    $property = $reflection->getProperty('format');
+    $property->setAccessible(true);
+    $value = $property->getValue($ollama);
+    
+    expect($value)->toBe($formatString);
+    expect($ollama)->toBeInstanceOf(Ollama::class);
+});
+
+it('correctly handles format as array type', function () {
+    $formatArray = [
+        'type' => 'object',
+        'properties' => [
+            'search' => ['type' => 'string'],
+            'tags' => ['type' => 'array', 'items' => ['type' => 'string']],
+        ],
+        'required' => ['search', 'tags'],
+        'additionalProperties' => false,
+    ];
+    
+    $ollama = $this->ollama->format($formatArray);
+    
+    // Get the protected property value using reflection
+    $reflection = new ReflectionClass($ollama);
+    $property = $reflection->getProperty('format');
+    $property->setAccessible(true);
+    $value = $property->getValue($ollama);
+    
+    expect($value)->toBe($formatArray);
+    expect($ollama)->toBeInstanceOf(Ollama::class);
+});
+
+it('maintains format value when chaining methods', function () {
+    $formatArray = [
+        'type' => 'object',
+        'properties' => ['example' => ['type' => 'string']],
+    ];
+    
+    $ollama = $this->ollama->format($formatArray)->model('gemma3:1b');
+    
+    // Get the protected property value using reflection
+    $reflection = new ReflectionClass($ollama);
+    $property = $reflection->getProperty('format');
+    $property->setAccessible(true);
+    $value = $property->getValue($ollama);
+    
+    expect($value)->toBe($formatArray);
+    expect($ollama)->toBeInstanceOf(Ollama::class);
+});
+
 it('correctly processes ask method with real API call', function () {
     $response = $this->ollama->agent('You are a weather expert...')
         ->prompt('Why is the sky blue? answer only in 4 words')
