@@ -157,10 +157,10 @@ class Ollama
     /**
      * Sets the format for generation.
      *
-     * @param string $format
+     * @param string|array $format
      * @return $this
      */
-    public function format(string $format)
+    public function format($format)
     {
         $this->format = $format;
         return $this;
