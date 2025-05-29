@@ -19,6 +19,7 @@ trait MakesHttpRequests
     protected function sendRequest(string $urlSuffix, array $data, string $method = 'post')
     {
         $url = config('ollama-laravel.url') . $urlSuffix;
+        $headers = config('ollama-laravel.headers', []);
 
         if (!empty($data['stream']) && $data['stream'] === true) {
             $client = new Client();
@@ -26,11 +27,14 @@ trait MakesHttpRequests
                 'json' => $data,
                 'stream' => true,
                 'timeout' => config('ollama-laravel.connection.timeout'),
+                'headers' => $headers,
             ]);
 
             return $response;
         } else {
-            $response = Http::timeout(config('ollama-laravel.connection.timeout'))->$method($url, $data);
+            $response = Http::withHeaders($headers)
+                ->timeout(config('ollama-laravel.connection.timeout'))
+                ->$method($url, $data);
             return $response->json();
         }
     }
