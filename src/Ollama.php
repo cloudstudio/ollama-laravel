@@ -378,6 +378,7 @@ class Ollama
             'options' => $this->options,
             'stream' => $this->stream,
             'tools' => $this->tools,
+            'keep_alive' => $this->keepAlive,
         ]);
     }
 
