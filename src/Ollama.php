@@ -217,10 +217,10 @@ class Ollama
     /**
      * Controls how long the model will stay loaded into memory following the request
      *
-     * @param string $keepAlive
+     * @param string|null $keepAlive
      * @return $this
      */
-    public function keepAlive(string $keepAlive)
+    public function keepAlive(?string $keepAlive)
     {
         $this->keepAlive = $keepAlive;
         return $this;
@@ -348,8 +348,11 @@ class Ollama
             'options' => $this->options,
             'stream' => $this->stream,
             'raw' => $this->raw,
-            'keep_alive' => $this->keepAlive,
         ];
+
+        if ($this->keepAlive !== null) {
+            $requestData['keep_alive'] = $this->keepAlive;
+        }
 
         if ($this->image) {
             $requestData['images'] = [$this->image];
@@ -371,15 +374,20 @@ class Ollama
      */
     public function chat(array $conversation)
     {
-        return $this->sendRequest('/api/chat', [
+        $requestData = [
             'model' => $this->model,
             'messages' => $conversation,
             'format' => $this->format,
             'options' => $this->options,
             'stream' => $this->stream,
             'tools' => $this->tools,
-            'keep_alive' => $this->keepAlive,
-        ]);
+        ];
+
+        if ($this->keepAlive !== null) {
+            $requestData['keep_alive'] = $this->keepAlive;
+        }
+
+        return $this->sendRequest('/api/chat', $requestData);
     }
 
 
