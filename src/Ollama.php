@@ -102,11 +102,12 @@ class Ollama
     protected $images = [];
 
     /**
-     * keep alive
+     * Controls how long the model stays loaded in memory.
+     * Set to null to use server default, or a duration string like "5m", "1h", etc.
      *
-     * @ var mixed
+     * @var string|null
      */
-    protected $keepAlive = "5m";
+    protected $keepAlive = null;
 
     /**
      * Ollama class constructor.
@@ -115,6 +116,7 @@ class Ollama
     {
         $this->modelService = $modelService;
         $this->model = config('ollama-laravel.model');
+        $this->keepAlive = config('ollama-laravel.keep_alive', null);
     }
 
     /**
@@ -215,12 +217,17 @@ class Ollama
     }
 
     /**
-     * Controls how long the model will stay loaded into memory following the request
+     * Controls how long the model will stay loaded into memory following the request.
      *
-     * @param string $keepAlive
+     * Examples:
+     * - keepAlive('5m') - Keep model loaded for 5 minutes
+     * - keepAlive('1h') - Keep model loaded for 1 hour
+     * - keepAlive(null) - Use server default configuration (respects OLLAMA_KEEP_ALIVE env var)
+     *
+     * @param string|null $keepAlive Duration string (e.g., "5m", "1h") or null to use server default
      * @return $this
      */
-    public function keepAlive(string $keepAlive)
+    public function keepAlive(?string $keepAlive)
     {
         $this->keepAlive = $keepAlive;
         return $this;
@@ -348,8 +355,11 @@ class Ollama
             'options' => $this->options,
             'stream' => $this->stream,
             'raw' => $this->raw,
-            'keep_alive' => $this->keepAlive,
         ];
+
+        if ($this->keepAlive !== null) {
+            $requestData['keep_alive'] = $this->keepAlive;
+        }
 
         if ($this->image) {
             $requestData['images'] = [$this->image];
@@ -371,15 +381,20 @@ class Ollama
      */
     public function chat(array $conversation)
     {
-        return $this->sendRequest('/api/chat', [
+        $requestData = [
             'model' => $this->model,
             'messages' => $conversation,
             'format' => $this->format,
             'options' => $this->options,
             'stream' => $this->stream,
             'tools' => $this->tools,
-            'keep_alive' => $this->keepAlive,
-        ]);
+        ];
+
+        if ($this->keepAlive !== null) {
+            $requestData['keep_alive'] = $this->keepAlive;
+        }
+
+        return $this->sendRequest('/api/chat', $requestData);
     }
 
 

@@ -124,3 +124,67 @@ it('sends custom headers from config in HTTP requests', function () {
             $request->hasHeader('X-Custom-Header', 'custom-value');
     });
 });
+
+it('sets keepAlive correctly and returns instance', function () {
+    expect($this->ollama->keepAlive('10m'))->toBeInstanceOf(Ollama::class);
+});
+
+it('allows keepAlive to be set to null', function () {
+    $ollama = $this->ollama->keepAlive(null);
+
+    $reflection = new ReflectionClass($ollama);
+    $property = $reflection->getProperty('keepAlive');
+    $property->setAccessible(true);
+    $value = $property->getValue($ollama);
+
+    expect($value)->toBeNull();
+    expect($ollama)->toBeInstanceOf(Ollama::class);
+});
+
+it('uses config value for keepAlive by default', function () {
+    config(['ollama-laravel.keep_alive' => '15m']);
+
+    $ollama = new Ollama(new ModelService());
+
+    $reflection = new ReflectionClass($ollama);
+    $property = $reflection->getProperty('keepAlive');
+    $property->setAccessible(true);
+    $value = $property->getValue($ollama);
+
+    expect($value)->toBe('15m');
+});
+
+it('defaults keepAlive to null when not configured', function () {
+    config(['ollama-laravel.keep_alive' => null]);
+
+    $ollama = new Ollama(new ModelService());
+
+    $reflection = new ReflectionClass($ollama);
+    $property = $reflection->getProperty('keepAlive');
+    $property->setAccessible(true);
+    $value = $property->getValue($ollama);
+
+    expect($value)->toBeNull();
+});
+
+it('does not include keep_alive in request when null', function () {
+    Http::fake();
+
+    $this->ollama->keepAlive(null)->prompt('test')->ask();
+
+    Http::assertSent(function ($request) {
+        $body = json_decode($request->body(), true);
+        return !array_key_exists('keep_alive', $body);
+    });
+});
+
+it('includes keep_alive in request when set', function () {
+    Http::fake();
+
+    $this->ollama->keepAlive('20m')->prompt('test')->ask();
+
+    Http::assertSent(function ($request) {
+        $body = json_decode($request->body(), true);
+        return isset($body['keep_alive']) && $body['keep_alive'] === '20m';
+    });
+});
