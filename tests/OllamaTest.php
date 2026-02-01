@@ -22,6 +22,7 @@ it('sets properties correctly and returns instance', function ($method, $value) 
     'options' => ['options', ['temperature' => 0.7]],
     'stream' => ['stream', true],
     'raw' => ['raw', true],
+    'think' => ['think', true],
 ]);
 
 it('correctly handles format as string type', function () {
@@ -186,5 +187,76 @@ it('includes keep_alive in request when set', function () {
     Http::assertSent(function ($request) {
         $body = json_decode($request->body(), true);
         return isset($body['keep_alive']) && $body['keep_alive'] === '20m';
+    });
+});
+
+it('sets think correctly with boolean and returns instance', function () {
+    expect($this->ollama->think(true))->toBeInstanceOf(Ollama::class);
+});
+
+it('sets think correctly with string level and returns instance', function () {
+    $ollama = $this->ollama->think('high');
+
+    $reflection = new ReflectionClass($ollama);
+    $property = $reflection->getProperty('think');
+    $property->setAccessible(true);
+    $value = $property->getValue($ollama);
+
+    expect($value)->toBe('high');
+    expect($ollama)->toBeInstanceOf(Ollama::class);
+});
+
+it('defaults think to true when called without arguments', function () {
+    $ollama = $this->ollama->think();
+
+    $reflection = new ReflectionClass($ollama);
+    $property = $reflection->getProperty('think');
+    $property->setAccessible(true);
+    $value = $property->getValue($ollama);
+
+    expect($value)->toBeTrue();
+});
+
+it('does not include think in request when null', function () {
+    Http::fake();
+
+    $this->ollama->prompt('test')->ask();
+
+    Http::assertSent(function ($request) {
+        $body = json_decode($request->body(), true);
+        return !array_key_exists('think', $body);
+    });
+});
+
+it('includes think in ask request when set to true', function () {
+    Http::fake();
+
+    $this->ollama->think(true)->prompt('test')->ask();
+
+    Http::assertSent(function ($request) {
+        $body = json_decode($request->body(), true);
+        return isset($body['think']) && $body['think'] === true;
+    });
+});
+
+it('includes think in chat request when set', function () {
+    Http::fake();
+
+    $this->ollama->think(true)->chat([['role' => 'user', 'content' => 'test']]);
+
+    Http::assertSent(function ($request) {
+        $body = json_decode($request->body(), true);
+        return isset($body['think']) && $body['think'] === true;
+    });
+});
+
+it('includes think level in request when set to string', function () {
+    Http::fake();
+
+    $this->ollama->think('medium')->prompt('test')->ask();
+
+    Http::assertSent(function ($request) {
+        $body = json_decode($request->body(), true);
+        return isset($body['think']) && $body['think'] === 'medium';
     });
 });

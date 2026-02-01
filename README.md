@@ -10,6 +10,7 @@ Ollama-Laravel is a Laravel package that provides seamless integration with the 
 - **Text Generation**: Generate content with customizable prompts and models
 - **Vision Analysis**: Analyze images using multimodal models
 - **Chat Completion**: Build conversational AI with message history
+- **Thinking/Reasoning**: Access model reasoning with thinking models (Qwen 3, DeepSeek R1, etc.)
 - **Function Calling**: Execute tools and functions through AI
 - **Streaming Responses**: Real-time response streaming
 - **Model Management**: List, copy, delete, and pull models
@@ -189,6 +190,55 @@ function calculateTotal($items) {
 
 $response = Ollama::model('codellama')
     ->chat($messages);
+```
+
+### 🧠 Thinking/Reasoning Models
+
+Ollama supports thinking models like Qwen 3, DeepSeek R1, and others that can show their reasoning process.
+
+#### Enable Thinking Output
+```php
+$response = Ollama::model('qwen3')
+    ->prompt('What is the square root of 144 and why?')
+    ->think()
+    ->ask();
+
+// Access the reasoning process
+echo $response['thinking'];  // Model's step-by-step reasoning
+echo $response['response'];  // Final answer
+```
+
+#### Thinking with Chat
+```php
+$messages = [
+    ['role' => 'user', 'content' => 'Solve this step by step: If x + 5 = 12, what is x?']
+];
+
+$response = Ollama::model('deepseek-r1')
+    ->think()
+    ->chat($messages);
+
+// Access thinking from chat response
+echo $response['message']['thinking'];  // Reasoning steps
+echo $response['message']['content'];   // Final answer
+```
+
+#### Thinking Levels (for supported models like GPT-OSS)
+```php
+// Some models support thinking levels: "low", "medium", "high"
+$response = Ollama::model('gpt-oss')
+    ->prompt('Explain quantum entanglement')
+    ->think('high')  // Maximum reasoning depth
+    ->ask();
+```
+
+#### Disable Thinking
+```php
+// Explicitly disable thinking output
+$response = Ollama::model('qwen3')
+    ->prompt('Quick answer: What is 2+2?')
+    ->think(false)
+    ->ask();
 ```
 
 ### 🔧 Function Calling / Tools

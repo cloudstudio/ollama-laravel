@@ -110,6 +110,14 @@ class Ollama
     protected $keepAlive = null;
 
     /**
+     * Enables thinking/reasoning output for supported models.
+     * Can be a boolean or a string level ("low", "medium", "high") for models like GPT-OSS.
+     *
+     * @var bool|string|null
+     */
+    protected $think = null;
+
+    /**
      * Ollama class constructor.
      */
     public function __construct(ModelService $modelService)
@@ -230,6 +238,27 @@ class Ollama
     public function keepAlive(?string $keepAlive)
     {
         $this->keepAlive = $keepAlive;
+        return $this;
+    }
+
+    /**
+     * Enables thinking/reasoning output for supported models (Qwen 3, DeepSeek R1, etc.).
+     *
+     * When enabled, the response will include the model's reasoning process in a separate field:
+     * - For chat: response['message']['thinking']
+     * - For generate: response['thinking']
+     *
+     * Examples:
+     * - think() or think(true) - Enable thinking output
+     * - think(false) - Disable thinking output
+     * - think('high') - Set thinking level (for models like GPT-OSS that support levels)
+     *
+     * @param bool|string $think Boolean to enable/disable, or string level ("low", "medium", "high")
+     * @return $this
+     */
+    public function think(bool|string $think = true)
+    {
+        $this->think = $think;
         return $this;
     }
 
@@ -361,6 +390,10 @@ class Ollama
             $requestData['keep_alive'] = $this->keepAlive;
         }
 
+        if ($this->think !== null) {
+            $requestData['think'] = $this->think;
+        }
+
         if ($this->image) {
             $requestData['images'] = [$this->image];
         }
@@ -392,6 +425,10 @@ class Ollama
 
         if ($this->keepAlive !== null) {
             $requestData['keep_alive'] = $this->keepAlive;
+        }
+
+        if ($this->think !== null) {
+            $requestData['think'] = $this->think;
         }
 
         return $this->sendRequest('/api/chat', $requestData);
