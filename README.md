@@ -1,7 +1,7 @@
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/cloudstudio/ollama-laravel.svg?style=flat-square)](https://packagist.org/packages/cloudstudio/ollama-laravel)
 [![Total Downloads](https://img.shields.io/packagist/dt/cloudstudio/ollama-laravel.svg?style=flat-square)](https://packagist.org/packages/cloudstudio/ollama-laravel)
 
-[![Need production AI systems? We build AI agents, RAG pipelines & Claude integrations for teams.](art/banner-cloudstudio.svg)](https://cloudstudio.es/for-developers)
+[![Need production AI systems? We build AI agents, RAG pipelines & Claude integrations for teams.](art/banner-cloudstudio.png)](https://cloudstudio.es/for-developers)
 
 # Ollama-Laravel Package
 
