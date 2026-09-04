@@ -23,7 +23,7 @@ Ollama-Laravel is a Laravel package that provides seamless integration with the 
 
 - PHP ^8.2
 - Laravel ^11.0
-- Ollama server running locally or remotely
+- Ollama server running locally or remotely (or an Ollama-API-compatible server such as [llmman](https://github.com/llmmanorg/llmman), see below)
 
 ## If you use Laravel 10.x, please use version V1.0.9
 
@@ -66,6 +66,23 @@ return [
     ],
 ];
 ```
+
+### Using with llmman
+
+[llmman](https://github.com/llmmanorg/llmman) is a local model runner that serves the Ollama API (alongside OpenAI- and Anthropic-compatible ones) on port 17434, so this package works against it unchanged. Point `OLLAMA_URL` at it:
+
+```env
+OLLAMA_URL=http://127.0.0.1:17434
+OLLAMA_MODEL=gemma4
+```
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/llmmanorg/llmman/main/install.sh | sh
+llmman pull gemma4
+llmman serve
+```
+
+Models can also be pulled straight from Hugging Face, e.g. `OLLAMA_MODEL=hf.co/unsloth/Qwen3.5-0.8B-GGUF`.
 
 ## 📖 Usage Examples
 
