@@ -77,7 +77,7 @@ OLLAMA_MODEL=gemma4
 ```
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/llmmanorg/llmman/main/install.sh | sh
+curl -fsSL https://llmmanorg.github.io/install.sh | sh
 llmman pull gemma4
 llmman serve
 ```
