@@ -118,6 +118,20 @@ class Ollama
     protected $think = null;
 
     /**
+     * Whether to return log probabilities of the output tokens.
+     *
+     * @var bool|null
+     */
+    protected $logprobs = null;
+
+    /**
+     * Number of most likely tokens (0-20) to return at each position. Only used with logprobs.
+     *
+     * @var int|null
+     */
+    protected $topLogprobs = null;
+
+    /**
      * Ollama class constructor.
      */
     public function __construct(ModelService $modelService)
@@ -263,6 +277,35 @@ class Ollama
     }
 
     /**
+     * Requests log probabilities of the output tokens.
+     *
+     * The probabilities are returned in the `logprobs` field of the response.
+     * Pass null to use the server default (the option is not sent).
+     *
+     * @param bool|null $logprobs
+     * @return $this
+     */
+    public function logprobs(?bool $logprobs = true)
+    {
+        $this->logprobs = $logprobs;
+        return $this;
+    }
+
+    /**
+     * Sets how many of the most likely tokens (0-20) are returned at each position,
+     * each with its log probability. Only applies when logprobs() is enabled.
+     * Pass null to use the server default (the option is not sent).
+     *
+     * @param int|null $topLogprobs
+     * @return $this
+     */
+    public function topLogprobs(?int $topLogprobs)
+    {
+        $this->topLogprobs = $topLogprobs;
+        return $this;
+    }
+
+    /**
      * Lists available local models.
      *
      * @return array
@@ -394,6 +437,14 @@ class Ollama
             $requestData['think'] = $this->think;
         }
 
+        if ($this->logprobs !== null) {
+            $requestData['logprobs'] = $this->logprobs;
+        }
+
+        if ($this->topLogprobs !== null) {
+            $requestData['top_logprobs'] = $this->topLogprobs;
+        }
+
         if ($this->image) {
             $requestData['images'] = [$this->image];
         }
@@ -429,6 +480,14 @@ class Ollama
 
         if ($this->think !== null) {
             $requestData['think'] = $this->think;
+        }
+
+        if ($this->logprobs !== null) {
+            $requestData['logprobs'] = $this->logprobs;
+        }
+
+        if ($this->topLogprobs !== null) {
+            $requestData['top_logprobs'] = $this->topLogprobs;
         }
 
         return $this->sendRequest('/api/chat', $requestData);

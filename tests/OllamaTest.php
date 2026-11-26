@@ -168,6 +168,37 @@ it('defaults keepAlive to null when not configured', function () {
     expect($value)->toBeNull();
 });
 
+it('sets logprobs and topLogprobs and returns instance', function () {
+    expect($this->ollama->logprobs())->toBeInstanceOf(Ollama::class);
+    expect($this->ollama->topLogprobs(5))->toBeInstanceOf(Ollama::class);
+});
+
+it('does not include logprobs in requests by default', function () {
+    Http::fake();
+
+    $this->ollama->prompt('test')->ask();
+    $this->ollama->chat([['role' => 'user', 'content' => 'test']]);
+
+    Http::assertSentCount(2);
+    Http::assertSent(function ($request) {
+        $body = json_decode($request->body(), true);
+        return !array_key_exists('logprobs', $body) && !array_key_exists('top_logprobs', $body);
+    });
+});
+
+it('includes logprobs and top_logprobs in generate and chat requests when set', function () {
+    Http::fake();
+
+    $this->ollama->logprobs()->topLogprobs(5)->prompt('test')->ask();
+    $this->ollama->chat([['role' => 'user', 'content' => 'test']]);
+
+    Http::assertSentCount(2);
+    Http::assertSent(function ($request) {
+        $body = json_decode($request->body(), true);
+        return ($body['logprobs'] ?? null) === true && ($body['top_logprobs'] ?? null) === 5;
+    });
+});
+
 it('does not include keep_alive in request when null', function () {
     Http::fake();
 
