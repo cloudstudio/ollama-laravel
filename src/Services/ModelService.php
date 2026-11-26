@@ -30,6 +30,16 @@ class ModelService
     }
 
     /**
+     * List models that are currently loaded into memory.
+     *
+     * @return array
+     */
+    public function listRunningModels()
+    {
+        return $this->sendRequest('/api/ps', [], 'get');
+    }
+
+    /**
      * Show information about a specific model.
      *
      * @param string $modelName

@@ -409,6 +409,15 @@ foreach ($models['models'] as $model) {
 }
 ```
 
+### List Running Models
+```php
+// Models currently loaded into memory (Ollama's /api/ps)
+$running = Ollama::runningModels();
+foreach ($running['models'] as $model) {
+    echo $model['name'] . " expires at " . $model['expires_at'] . "\n";
+}
+```
+
 ### Get Model Information
 ```php
 $info = Ollama::model('llama3.1')->show();
