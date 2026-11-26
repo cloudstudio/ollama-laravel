@@ -118,6 +118,22 @@ class Ollama
     protected $think = null;
 
     /**
+     * Whether to truncate the prompt/chat history when it exceeds the context length.
+     * Null leaves the decision to the server.
+     *
+     * @var bool|null
+     */
+    protected $truncate = null;
+
+    /**
+     * Whether to shift the context window when the context length is reached during
+     * generation instead of erroring. Null leaves the decision to the server.
+     *
+     * @var bool|null
+     */
+    protected $shift = null;
+
+    /**
      * Ollama class constructor.
      */
     public function __construct(ModelService $modelService)
@@ -263,6 +279,38 @@ class Ollama
     }
 
     /**
+     * Controls what happens when the prompt (or chat history) exceeds the context length.
+     *
+     * - truncate(true) - Truncate the prompt to fit
+     * - truncate(false) - Return an error instead
+     * - truncate(null) - Use the server default (the option is not sent)
+     *
+     * @param bool|null $truncate
+     * @return $this
+     */
+    public function truncate(?bool $truncate = true)
+    {
+        $this->truncate = $truncate;
+        return $this;
+    }
+
+    /**
+     * Controls what happens when the context length is reached during generation.
+     *
+     * - shift(true) - Shift the context window and keep generating
+     * - shift(false) - Stop instead
+     * - shift(null) - Use the server default (the option is not sent)
+     *
+     * @param bool|null $shift
+     * @return $this
+     */
+    public function shift(?bool $shift = true)
+    {
+        $this->shift = $shift;
+        return $this;
+    }
+
+    /**
      * Lists available local models.
      *
      * @return array
@@ -394,6 +442,14 @@ class Ollama
             $requestData['think'] = $this->think;
         }
 
+        if ($this->truncate !== null) {
+            $requestData['truncate'] = $this->truncate;
+        }
+
+        if ($this->shift !== null) {
+            $requestData['shift'] = $this->shift;
+        }
+
         if ($this->image) {
             $requestData['images'] = [$this->image];
         }
@@ -429,6 +485,14 @@ class Ollama
 
         if ($this->think !== null) {
             $requestData['think'] = $this->think;
+        }
+
+        if ($this->truncate !== null) {
+            $requestData['truncate'] = $this->truncate;
+        }
+
+        if ($this->shift !== null) {
+            $requestData['shift'] = $this->shift;
         }
 
         return $this->sendRequest('/api/chat', $requestData);

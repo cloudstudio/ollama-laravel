@@ -543,7 +543,22 @@ try {
 }
 ```
 
-### 5. Performance Optimization
+### 5. Context Length Handling
+```php
+// Return an error instead of silently truncating a prompt that is too long
+$response = Ollama::model('llama3.1')
+    ->truncate(false)
+    ->prompt($longPrompt)
+    ->ask();
+
+// Keep generating when the context window fills up
+$response = Ollama::model('llama3.1')
+    ->shift()
+    ->chat($messages);
+```
+Both are only sent when you call them, so the server defaults apply otherwise.
+
+### 6. Performance Optimization
 ```php
 // Use keepAlive for multiple requests
 $ollama = Ollama::model('llama3.1')->keepAlive('10m');
