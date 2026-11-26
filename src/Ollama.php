@@ -273,6 +273,16 @@ class Ollama
     }
 
     /**
+     * Lists the models that are currently loaded into memory (`/api/ps`).
+     *
+     * @return array|Response
+     */
+    public function runningModels()
+    {
+        return $this->modelService->listRunningModels();
+    }
+
+    /**
      * Shows information about the selected model.
      *
      * @return array

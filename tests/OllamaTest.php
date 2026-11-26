@@ -168,6 +168,17 @@ it('defaults keepAlive to null when not configured', function () {
     expect($value)->toBeNull();
 });
 
+it('lists running models from /api/ps with a GET request', function () {
+    Http::fake([
+        '*/api/ps' => Http::response(['models' => [['name' => 'llama3.1', 'context_length' => 8192]]]),
+    ]);
+
+    $result = $this->ollama->runningModels();
+
+    expect($result['models'][0]['name'])->toBe('llama3.1');
+    Http::assertSent(fn ($request) => $request->method() === 'GET' && str_ends_with($request->url(), '/api/ps'));
+});
+
 it('does not include keep_alive in request when null', function () {
     Http::fake();
 
