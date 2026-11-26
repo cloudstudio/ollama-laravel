@@ -168,6 +168,38 @@ it('defaults keepAlive to null when not configured', function () {
     expect($value)->toBeNull();
 });
 
+it('sets truncate and shift and returns instance', function () {
+    expect($this->ollama->truncate(false))->toBeInstanceOf(Ollama::class);
+    expect($this->ollama->shift())->toBeInstanceOf(Ollama::class);
+});
+
+it('does not include truncate or shift in requests by default', function () {
+    Http::fake();
+
+    $this->ollama->prompt('test')->ask();
+    $this->ollama->chat([['role' => 'user', 'content' => 'test']]);
+
+    Http::assertSentCount(2);
+    Http::assertSent(function ($request) {
+        $body = json_decode($request->body(), true);
+        return !array_key_exists('truncate', $body) && !array_key_exists('shift', $body);
+    });
+});
+
+it('includes truncate and shift in generate and chat requests when set', function () {
+    Http::fake();
+
+    $this->ollama->truncate(false)->shift(true)->prompt('test')->ask();
+    $this->ollama->chat([['role' => 'user', 'content' => 'test']]);
+
+    Http::assertSentCount(2);
+    Http::assertSent(function ($request) {
+        $body = json_decode($request->body(), true);
+        return array_key_exists('truncate', $body) && $body['truncate'] === false
+            && array_key_exists('shift', $body) && $body['shift'] === true;
+    });
+});
+
 it('does not include keep_alive in request when null', function () {
     Http::fake();
 
